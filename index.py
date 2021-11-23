@@ -10,6 +10,8 @@ import uuid
 import breed_routes
 import breed_size_routes
 import user_routes
+import dog_routes
+import information_routes
 
 #######################################################
 # Instancia da Aplicacao Flask
@@ -102,7 +104,7 @@ def get_breed_by_size(sizeId=None):
 
 
 #######################################################
-# ROTAS PORTE
+# ROTA PORTE
 #######################################################
 
 #######################################################
@@ -120,46 +122,47 @@ def get_all_size():
 # 1. Cadastrar cachorro
 @app.route('/cachorro', methods=['POST'])
 def create_dog():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.create_dog()
 
 #######################################################
 # 2. Atualizar cachorro
 @app.route('/cachorro', methods=['PUT'])
 def update_dog():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.update_dog()
 
 #######################################################
-# 1. Buscar cachorro pelo id
+# 3. Deletar cachorro
 @app.route('/cachorro/<iddog>', methods=['DELETE'])
 def delete_dog():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.delete_dog()
 
-# 1. Buscar usuario pelo id
+#######################################################
+# 4. Buscar cachorro pelo id
 @app.route('/cachorro/<iddog>', methods=['GET'])
 def get_dog_by_id():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.get_dog_by_id()
 
-# 1. Buscar usuario pelo id
+#######################################################
+# 5. Buscar cachorro por usuario
 @app.route('/usuarioCachorros/<iduser>', methods=['GET'])
 def get_dogs_by_user():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.get_dogs_by_user()
 
-# 1. Buscar usuario pelo id
+#######################################################
+# 6. Buscar todos os cachorros
 @app.route('/cachorros', methods=['GET'])
 def get_all_dogs():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.get_all_dogs()
 
-# 1. Buscar usuario pelo id
+
+#######################################################
+# ROTA INFORMAÇOES
+#######################################################
+
+# 1. Buscar informaçoes
 @app.route('/informacoes', methods=['GET'])
 def get_info():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return information_routes.get_info()
 
 
 #######################################################

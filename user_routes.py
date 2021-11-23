@@ -1,4 +1,3 @@
-from flask import Flask
 from flask import request
 from flask import jsonify
 from flask import make_response
@@ -40,7 +39,6 @@ def create_user():
 
         id_usuario = str(uuid.uuid4())
         password = sha256_crypt.hash(senha_um)
-        #print(sha256_crypt.verify(password, password1))
 
         registro = (id_usuario, nome, email, rua, numero, bairro, cep, cidadeId, estadoId, sexoId, telefone, password)
         names = ['id', 'nome', 'email', 'rua', 'numero', 'bairro', 'cep', 'cidadeId', 'estadoId', 'sexoId', 'telefone', 'password']
@@ -97,6 +95,7 @@ def get_all_users():
             json_data = []
             for reg in registros:
                 json_obj = dict(zip(names, reg))
+                #print(sha256_crypt.verify("12345678", json_obj['password']))
                 del json_obj['password']
                 json_data.append(json_obj)
 
