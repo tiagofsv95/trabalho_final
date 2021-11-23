@@ -1,12 +1,7 @@
 from flask import Flask
-from flask import request
 from flask import jsonify
-from datetime import datetime
 from flask import make_response
-import sqlite3
-from sqlite3 import Error
 import os
-import uuid
 import breed_routes
 import breed_size_routes
 import user_routes
@@ -127,20 +122,20 @@ def update_dog():
 #######################################################
 # 3. Deletar cachorro
 @app.route('/cachorro/<iddog>', methods=['DELETE'])
-def delete_dog():
-    return dog_routes.delete_dog()
+def delete_dog(iddog=None):
+    return dog_routes.delete_dog(iddog)
 
 #######################################################
 # 4. Buscar cachorro pelo id
 @app.route('/cachorro/<iddog>', methods=['GET'])
-def get_dog_by_id():
-    return dog_routes.get_dog_by_id()
+def get_dog_by_id(iddog=None):
+    return dog_routes.get_dog_by_id(iddog)
 
 #######################################################
 # 5. Buscar cachorro por usuario
 @app.route('/usuarioCachorros/<iduser>', methods=['GET'])
-def get_dogs_by_user():
-    return dog_routes.get_dogs_by_user()
+def get_dogs_by_user(iduser=None):
+    return dog_routes.get_dogs_by_user(iduser)
 
 #######################################################
 # 6. Buscar todos os cachorros
@@ -160,149 +155,13 @@ def get_info():
 
 
 #######################################################
-# 1. Cadastrar produtos
-@app.route('/produtos/cadastrar', methods=['POST'])
-def cadastrar():
-    descricao = None
-    precocompra = None
-    precovenda = None
-
-    idproduto = str(uuid.uuid4())
-    descricao = request.json['descricao']
-    precocompra = request.json['precocompra']
-    precovenda = request.json['precovenda']
-    datacriacao = datetime.now()
-
-    if idproduto and descricao and precocompra and precovenda and datacriacao:
-        registro = (idproduto, descricao, precocompra, precovenda, datacriacao)
-        names = ['idproduto', 'descricao', 'precocompra', 'precovenda', 'datacriacao']
-        try:
-            conn = sqlite3.connect(dirname + '/DB/dbprodutos.db')
-            sql = ''' INSERT INTO produtos(idproduto, descricao, precocompra, precovenda, datacriacao)
-                        VALUES(?,?,?,?,?) '''
-            cur = conn.cursor()
-            cur.execute(sql, registro)
-
-            json_data = []
-            json_data.append(dict(zip(names, registro)))
-
-            conn.commit()
-            resp = make_response(jsonify(json_data), 200)
-            return resp
-
-        except Error as e:
-            resp = make_response(jsonify({'mensagem': e}), 500)
-            return resp
-        finally:
-            conn.close()
-    else:
-        resp = make_response(jsonify({'mensagem': 'Erro na requisição.'}), 400)
-        return resp
-
-
-#######################################################
-# 2. Listar produtos
-@app.route('/produtos/listar', methods=['GET'])
-def listar():
-    try:
-        conn = sqlite3.connect(dirname + '/DB/dbprodutos.db')
-        sql = '''SELECT * FROM produtos'''
-        cur = conn.cursor()
-        cur.execute(sql)
-        registros = cur.fetchall()
-
-        if registros:
-            names = [description[0] for description in cur.description]
-
-            json_data = []
-            for reg in registros:
-                json_data.append(dict(zip(names, reg)))
-
-            resp = make_response(jsonify(json_data), 200)
-            return resp
-
-        else:
-            resp = make_response(jsonify({'mensagem': 'Registro não encontrado.'}), 204)
-            return resp
-
-    except Error as e:
-        resp = make_response(jsonify({'mensagem': e}), 500)
-        return resp
-
-    finally:
-        conn.close()
-
-#######################################################
-# 3. Alterar produtos
-@app.route('/produtos/atualizar-por-id/<idproduto>', methods=['PUT'])
-def alterar(idproduto=None):
-    if idproduto == None:
-        resp = make_response(jsonify({'mensagem': 'Parametro idproduto invalido.'}), 400)
-        return resp
-    else:
-        try:
-            descricao = None
-            precocompra = None
-            precovenda = None
-
-            conn = sqlite3.connect(dirname + '/DB/dbprodutos.db')
-            sql = '''SELECT * FROM produtos WHERE idproduto = ''' + '"' + idproduto + '"'
-            cur = conn.cursor()
-            cur.execute(sql)
-            registro = cur.fetchone()
-
-            if registro:
-                if request.json and registro:
-                    if 'descricao' in request.json:
-                        descricao = request.json['descricao']
-                    else:
-                        descricao = registro[1]
-
-                    if 'precocompra' in request.json:
-                        precocompra = request.json['precocompra']
-                    else:
-                        precocompra = registro[2]
-
-                    if 'precovenda' in request.json:
-                        precovenda = request.json['precovenda']
-                    else:
-                        precovenda = registro[3]
-
-                    datacriacao = registro[4]
-
-                registro = (idproduto, descricao, precocompra, precovenda, datacriacao)
-
-                sql = ''' UPDATE produtos
-                        SET idproduto = ?, descricao = ?, precocompra = ?, precovenda = ?, datacriacao = ?
-                        WHERE idproduto = ''' + '"' + idproduto + '"'
-                cur = conn.cursor()
-                cur.execute(sql, registro)
-
-                names = ['idproduto', 'descricao', 'precocompra', 'precovenda', 'datacriacao']
-
-                json_data = []
-                json_data.append(dict(zip(names, registro)))
-
-                conn.commit()
-                resp = make_response(jsonify(json_data), 200)
-                return resp
-            else:
-                resp = make_response(jsonify({'mensagem': 'Produto nao encontrado.'}), 400)
-                return resp
-
-        except Error as e:
-            resp = make_response(jsonify({'mensagem': e}), 500)
-            return resp
-        finally:
-            conn.close()
-
-
-#######################################################
 # Rota de Erro
+#######################################################
 @app.errorhandler(404)
 def rota_nao_encontrada(e):
     resp = make_response(jsonify({'mensagem': 'Rota não foi encontrada.'}), 404)
     return resp
+
 
 #######################################################
 # Execucao da Aplicacao
