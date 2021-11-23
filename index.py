@@ -10,6 +10,8 @@ import uuid
 import breed_routes
 import breed_size_routes
 import user_routes
+import dog_routes
+import information_routes
 
 #######################################################
 # Instancia da Aplicacao Flask
@@ -36,43 +38,37 @@ def create_user():
     return user_routes.create_user()
 
 #######################################################
-# 2. Buscar usuarios por nome
-@app.route('/usuarios/nome', methods=['GET'])
-def get_all_users_by_name():
-    return user_routes.get_all_users_by_name()
-
-#######################################################
-# 3. Buscar usuarios todos os usuarios
+# 2. Buscar usuarios todos os usuarios
 @app.route('/usuarios', methods=['GET'])
 def get_all_users():
     return user_routes.get_all_users()
 
 #######################################################
-# 4. Buscar usuario pelo id
+# 3. Buscar usuario pelo id
 @app.route('/usuario/<iduser>', methods=['GET'])
 def get_user_by_id(iduser=None):
     return user_routes.get_user_by_id(iduser)
 
 #######################################################
-# 5. Atualizar usuarios pelo id
+# 4. Atualizar usuarios pelo id
 @app.route('/usuario/<iduser>', methods=['PUT'])
-def update_user():
-    return user_routes.update_user()
+def update_user(iduser=None):
+    return user_routes.update_user(iduser)
 
 #######################################################
-# 6. Deletar usuarios pelo id
+# 5. Deletar usuarios pelo id
 @app.route('/usuario/<iduser>', methods=['DELETE'])
-def delete_user():
-    return user_routes.delete_user()
+def delete_user(iduser=None):
+    return user_routes.delete_user(iduser)
 
 #######################################################
-# 7. Autenticar usuario
+# 6. Autenticar usuario
 @app.route('/autenticarUsuario', methods=['POST'])
 def auth_user():
     return user_routes.auth_user()
 
 #######################################################
-# 8. Deslogar usuario
+# 7. Deslogar usuario
 @app.route('/deslogarUsuario', methods=['POST'])
 def logout_user():
     return user_routes.logout_user()
@@ -102,7 +98,7 @@ def get_breed_by_size(sizeId=None):
 
 
 #######################################################
-# ROTAS PORTE
+# ROTA PORTE
 #######################################################
 
 #######################################################
@@ -120,46 +116,47 @@ def get_all_size():
 # 1. Cadastrar cachorro
 @app.route('/cachorro', methods=['POST'])
 def create_dog():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.create_dog()
 
 #######################################################
 # 2. Atualizar cachorro
 @app.route('/cachorro', methods=['PUT'])
 def update_dog():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.update_dog()
 
 #######################################################
-# 1. Buscar cachorro pelo id
+# 3. Deletar cachorro
 @app.route('/cachorro/<iddog>', methods=['DELETE'])
 def delete_dog():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.delete_dog()
 
-# 1. Buscar usuario pelo id
+#######################################################
+# 4. Buscar cachorro pelo id
 @app.route('/cachorro/<iddog>', methods=['GET'])
 def get_dog_by_id():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.get_dog_by_id()
 
-# 1. Buscar usuario pelo id
+#######################################################
+# 5. Buscar cachorro por usuario
 @app.route('/usuarioCachorros/<iduser>', methods=['GET'])
 def get_dogs_by_user():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.get_dogs_by_user()
 
-# 1. Buscar usuario pelo id
+#######################################################
+# 6. Buscar todos os cachorros
 @app.route('/cachorros', methods=['GET'])
 def get_all_dogs():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return dog_routes.get_all_dogs()
 
-# 1. Buscar usuario pelo id
+
+#######################################################
+# ROTA INFORMAÇOES
+#######################################################
+
+# 1. Buscar informaçoes
 @app.route('/informacoes', methods=['GET'])
 def get_info():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    return information_routes.get_info()
 
 
 #######################################################
@@ -299,31 +296,6 @@ def alterar(idproduto=None):
         finally:
             conn.close()
 
-
-#######################################################
-# 4. Deletar produtos
-@app.route('/produtos/deletar/<idproduto>', methods=['DELETE'])
-def deletar(idproduto=None):
-    if idproduto == None:
-        resp = make_response(jsonify({'mensagem': 'Parametro idproduto invalido.'}), 400)
-        return resp
-    else:
-        try:
-            conn = sqlite3.connect(dirname + '/DB/dbprodutos.db')
-            sql = '''DELETE FROM produtos WHERE idproduto = ''' + '"' + idproduto + '"'
-            cur = conn.cursor()
-            cur.execute(sql)
-
-            conn.commit()
-
-            resp = make_response(jsonify({'mensagem': 'Registro deletado com sucesso.'}), 200)
-            return resp
-        except Error as e:
-            print(e)
-            resp = make_response(jsonify({'mensagem': e}), 500)
-            return resp
-        finally:
-            conn.close()
 
 #######################################################
 # Rota de Erro

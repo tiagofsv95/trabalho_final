@@ -1,4 +1,3 @@
-from flask import Flask
 from flask import request
 from flask import jsonify
 from flask import make_response
@@ -7,9 +6,11 @@ from sqlite3 import Error
 import os
 import uuid
 from passlib.hash import sha256_crypt
+import jwt_lib_api
 
 dirname = os.path.dirname(__file__)
 database_dirname = dirname + '/database/adote_um_cao.db'
+secret_key = '223d81adc68996234dd0734219aac254'
 
 #######################################################
 # 1. Criar usuario
@@ -40,7 +41,6 @@ def create_user():
 
         id_usuario = str(uuid.uuid4())
         password = sha256_crypt.hash(senha_um)
-        #print(sha256_crypt.verify(password, password1))
 
         registro = (id_usuario, nome, email, rua, numero, bairro, cep, cidadeId, estadoId, sexoId, telefone, password)
         names = ['id', 'nome', 'email', 'rua', 'numero', 'bairro', 'cep', 'cidadeId', 'estadoId', 'sexoId', 'telefone', 'password']
@@ -60,7 +60,9 @@ def create_user():
             cur = conn.cursor()
             cur.execute(sql, registro)
 
-            json_data = [dict(zip(names, registro))]
+            json_obj = dict(zip(names, registro))
+            del json_obj['password']
+            json_data = [json_obj]
 
             conn.commit()
             resp = make_response(jsonify(json_data), 200)
@@ -76,13 +78,7 @@ def create_user():
         return resp
 
 #######################################################
-# 2. Buscar usuarios por nome
-def get_all_users_by_name():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
-
-#######################################################
-# 3. Buscar usuarios todos os usuarios
+# 2. Buscar usuarios todos os usuarios
 def get_all_users():
     try:
         conn = sqlite3.connect(database_dirname)
@@ -115,7 +111,7 @@ def get_all_users():
         conn.close()
 
 #######################################################
-# 4. Buscar usuario pelo id
+# 3. Buscar usuario pelo id
 def get_user_by_id(iduser=None):
     if iduser == None:
         resp = make_response(jsonify({'mensagem': 'Parametro id do usuario invalido.'}), 400)
@@ -148,25 +144,166 @@ def get_user_by_id(iduser=None):
             conn.close()
 
 #######################################################
-# 5. Atualizar usuarios pelo id
-def update_user():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+# 4. Atualizar usuarios pelo id
+def update_user(iduser):
+    if iduser == None:
+        resp = make_response(jsonify({'mensagem': 'Parametro id usuario invalido.'}), 400)
+        return resp
+    else:
+        try:
+            nome = request.json['nome']
+            rua = request.json['rua']
+            numero = request.json['numero']
+            bairro = request.json['bairro']
+            cep = request.json['cep']
+            cidadeId = request.json['cidadeId']
+            estadoId = request.json['estadoId']
+            telefone = request.json['telefone']
+
+            conn = sqlite3.connect(database_dirname)
+            sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + iduser + '"'
+            cur = conn.cursor()
+            cur.execute(sql)
+            usuario = cur.fetchone()
+
+            if usuario:
+                names = [description[0] for description in cur.description]
+                json_obj = dict(zip(names, usuario))
+                if request.json and usuario:
+                    if 'nome' not in request.json:
+                        nome = json_obj['nome']
+
+                    if 'rua' not in request.json:
+                        rua = json_obj['rua']
+
+                    if 'numero' not in request.json:
+                        numero = json_obj['numero']
+
+                    if 'bairro' not in request.json:
+                        bairro = json_obj['bairro']
+
+                    if 'cep' not in request.json:
+                        cep = json_obj['cep']
+
+                    if 'cidadeId' not in request.json:
+                        cidadeId = json_obj['cidadeId']
+
+                    if 'estadoId' not in request.json:
+                        estadoId = json_obj['estadoId']
+
+                    if 'telefone' not in request.json:
+                        telefone = json_obj['telefone']
+
+                    registro = (nome, rua, numero, bairro, cep, cidadeId, estadoId, telefone)
+
+                    sql = ''' UPDATE Usuario
+                                            SET nome = ?, rua = ?, numero = ?, bairro = ?, cep = ?, cidadeId = ?, estadoId = ?, telefone =?
+                                            WHERE id = ''' + '"' + iduser + '"'
+                    cur = conn.cursor()
+                    cur.execute(sql, registro)
+                    conn.commit()
+
+                    sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + iduser + '"'
+                    cur = conn.cursor()
+                    cur.execute(sql)
+                    updated_user = cur.fetchone()
+
+                    json_obj = dict(zip(names, updated_user))
+                    del json_obj['password']
+                    json_data = [json_obj]
+
+                    resp = make_response(jsonify(json_data), 200)
+                    return resp
+
+            else:
+                resp = make_response(jsonify({'mensagem': 'Usuario nao encontrado.'}), 400)
+                return resp
+
+        except Error as e:
+            resp = make_response(jsonify({'mensagem': e}), 500)
+            return resp
+        finally:
+            conn.close()
+
 
 #######################################################
-# 6. Deletar usuarios pelo id
-def delete_user():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+# 5. Deletar usuarios pelo id
+def delete_user(iduser=None):
+    if iduser == None:
+        resp = make_response(jsonify({'mensagem': 'Parametro idproduto invalido.'}), 400)
+        return resp
+    else:
+        try:
+            conn = sqlite3.connect(database_dirname)
+            sql = '''DELETE FROM Usuario WHERE id = ''' + '"' + iduser + '"'
+            cur = conn.cursor()
+            cur.execute(sql)
+
+            conn.commit()
+
+            resp = make_response(jsonify({'mensagem': 'Registro deletado com sucesso.'}), 200)
+            return resp
+        except Error as e:
+            print(e)
+            resp = make_response(jsonify({'mensagem': e}), 500)
+            return resp
+        finally:
+            conn.close()
 
 #######################################################
-# 7. Autenticar usuario
+# 6. Autenticar usuario
 def auth_user():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
-    return resp
+    email = request.json['email']
+    password = request.json['password']
+
+    if email and password:
+        try:
+            conn = sqlite3.connect(database_dirname)
+            sql = '''SELECT * FROM Usuario WHERE email = ''' + '"' + email + '"'
+            cur = conn.cursor()
+            cur.execute(sql)
+            usuario = cur.fetchone()
+
+            if usuario:
+                names = [description[0] for description in cur.description]
+                usuario_obj = dict(zip(names, usuario))
+                if (sha256_crypt.verify(password, usuario_obj['password'])):
+                    token = jwt_lib_api.create_token(email, 5, secret_key)
+                    del usuario_obj['password']
+                    json_respose_obj = {
+                        'auth': True,
+                        'token': token,
+                        'usuario': usuario_obj,
+                        'message': 'Usuario autenticado com sucesso!'
+                    }
+
+                    resp = make_response(jsonify(json_respose_obj), 200)
+                    return resp
+
+                else:
+                    resp = make_response(jsonify({'mensagem': 'Email ou senha incorretos!'}), 400)
+                    return resp
+
+            else:
+                resp = make_response(jsonify({'mensagem': 'Email ou senha incorretos!'}), 400)
+                return resp
+
+        except Error as e:
+            resp = make_response(jsonify({'mensagem': e}), 500)
+            return resp
+
+        finally:
+            conn.close()
+    else:
+        resp = make_response(jsonify({'mensagem': 'Campo email ou senha vazios!'}), 400)
+        return resp
+
 
 #######################################################
-# 8. Deslogar usuario
+# 7. Deslogar usuario
 def logout_user():
-    resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
+    logout_obj = {
+        'auth': False, 'token': None
+    }
+    resp = make_response(jsonify(logout_obj), 200)
     return resp
