@@ -38,43 +38,37 @@ def create_user():
     return user_routes.create_user()
 
 #######################################################
-# 2. Buscar usuarios por nome
-@app.route('/usuarios/nome', methods=['GET'])
-def get_all_users_by_name():
-    return user_routes.get_all_users_by_name()
-
-#######################################################
-# 3. Buscar usuarios todos os usuarios
+# 2. Buscar usuarios todos os usuarios
 @app.route('/usuarios', methods=['GET'])
 def get_all_users():
     return user_routes.get_all_users()
 
 #######################################################
-# 4. Buscar usuario pelo id
+# 3. Buscar usuario pelo id
 @app.route('/usuario/<iduser>', methods=['GET'])
 def get_user_by_id(iduser=None):
     return user_routes.get_user_by_id(iduser)
 
 #######################################################
-# 5. Atualizar usuarios pelo id
+# 4. Atualizar usuarios pelo id
 @app.route('/usuario/<iduser>', methods=['PUT'])
-def update_user():
-    return user_routes.update_user()
+def update_user(iduser=None):
+    return user_routes.update_user(iduser)
 
 #######################################################
-# 6. Deletar usuarios pelo id
+# 5. Deletar usuarios pelo id
 @app.route('/usuario/<iduser>', methods=['DELETE'])
-def delete_user():
-    return user_routes.delete_user()
+def delete_user(iduser=None):
+    return user_routes.delete_user(iduser)
 
 #######################################################
-# 7. Autenticar usuario
+# 6. Autenticar usuario
 @app.route('/autenticarUsuario', methods=['POST'])
 def auth_user():
     return user_routes.auth_user()
 
 #######################################################
-# 8. Deslogar usuario
+# 7. Deslogar usuario
 @app.route('/deslogarUsuario', methods=['POST'])
 def logout_user():
     return user_routes.logout_user()
@@ -302,31 +296,6 @@ def alterar(idproduto=None):
         finally:
             conn.close()
 
-
-#######################################################
-# 4. Deletar produtos
-@app.route('/produtos/deletar/<idproduto>', methods=['DELETE'])
-def deletar(idproduto=None):
-    if idproduto == None:
-        resp = make_response(jsonify({'mensagem': 'Parametro idproduto invalido.'}), 400)
-        return resp
-    else:
-        try:
-            conn = sqlite3.connect(dirname + '/DB/dbprodutos.db')
-            sql = '''DELETE FROM produtos WHERE idproduto = ''' + '"' + idproduto + '"'
-            cur = conn.cursor()
-            cur.execute(sql)
-
-            conn.commit()
-
-            resp = make_response(jsonify({'mensagem': 'Registro deletado com sucesso.'}), 200)
-            return resp
-        except Error as e:
-            print(e)
-            resp = make_response(jsonify({'mensagem': e}), 500)
-            return resp
-        finally:
-            conn.close()
 
 #######################################################
 # Rota de Erro
