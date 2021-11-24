@@ -1,7 +1,6 @@
 import jwt
 import datetime
 
-
 def create_token(user, expireminutes, secretkey):
     creation_date = datetime.datetime.now()
     expiration_date = creation_date + datetime.timedelta(minutes=expireminutes)

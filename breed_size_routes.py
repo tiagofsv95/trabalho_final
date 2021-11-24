@@ -26,11 +26,11 @@ def get_all_size():
             return resp
 
         else:
-            resp = make_response(jsonify({'mensagem': 'Registro não encontrado.'}), 204)
+            resp = make_response(jsonify({'error': 'Registro não encontrado.'}), 204)
             return resp
 
     except Error as e:
-        resp = make_response(jsonify({'mensagem': e}), 500)
+        resp = make_response(jsonify({'error': e}), 500)
         return resp
 
     finally:

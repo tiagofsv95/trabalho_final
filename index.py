@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import request
 from flask import jsonify
 from flask import make_response
 import os
@@ -7,12 +8,14 @@ import breed_size_routes
 import user_routes
 import dog_routes
 import information_routes
+import jwt_lib_api
 
 #######################################################
 # Instancia da Aplicacao Flask
 app = Flask(__name__)
 dirname = os.path.dirname(__file__)
 database_dirname = dirname + '/database/adote_um_cao.db'
+secret_key = '223d81adc68996234dd0734219aac254'
 
 #######################################################
 # 0. Testar aplicação
@@ -20,7 +23,6 @@ database_dirname = dirname + '/database/adote_um_cao.db'
 def test_get():
     resp = make_response(jsonify({'mensagem': 'APPLICATION UP.'}), 200)
     return resp
-
 
 #######################################################
 # ROUTAS USUARIOS
@@ -36,25 +38,54 @@ def create_user():
 # 2. Buscar usuarios todos os usuarios
 @app.route('/usuarios', methods=['GET'])
 def get_all_users():
-    return user_routes.get_all_users()
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return user_routes.get_all_users()
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 3. Buscar usuario pelo id
 @app.route('/usuario/<iduser>', methods=['GET'])
 def get_user_by_id(iduser=None):
-    return user_routes.get_user_by_id(iduser)
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return user_routes.get_user_by_id(iduser)
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 4. Atualizar usuarios pelo id
 @app.route('/usuario/<iduser>', methods=['PUT'])
 def update_user(iduser=None):
-    return user_routes.update_user(iduser)
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return user_routes.update_user(iduser)
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 5. Deletar usuarios pelo id
 @app.route('/usuario/<iduser>', methods=['DELETE'])
 def delete_user(iduser=None):
-    return user_routes.delete_user(iduser)
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return user_routes.delete_user(iduser)
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
+
 
 #######################################################
 # 6. Autenticar usuario
@@ -83,7 +114,14 @@ def get_all_breed():
 # 2. Buscar raça pelo id
 @app.route('/raca/<idbreed>', methods=['GET'])
 def get_breed_by_id(idbreed=None):
-    return breed_routes.get_breed_by_id(idbreed)
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return breed_routes.get_breed_by_id(idbreed)
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 3. Buscar todas as raças por porte
@@ -102,7 +140,6 @@ def get_breed_by_size(sizeId=None):
 def get_all_size():
     return breed_size_routes.get_all_size()
 
-
 #######################################################
 # ROTAS CACHORRO
 #######################################################
@@ -111,31 +148,66 @@ def get_all_size():
 # 1. Cadastrar cachorro
 @app.route('/cachorro', methods=['POST'])
 def create_dog():
-    return dog_routes.create_dog()
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return dog_routes.create_dog()
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 2. Atualizar cachorro
 @app.route('/cachorro', methods=['PUT'])
 def update_dog():
-    return dog_routes.update_dog()
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return dog_routes.update_dog()
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 3. Deletar cachorro
 @app.route('/cachorro/<iddog>', methods=['DELETE'])
 def delete_dog(iddog=None):
-    return dog_routes.delete_dog(iddog)
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return dog_routes.delete_dog(iddog)
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 4. Buscar cachorro pelo id
 @app.route('/cachorro/<iddog>', methods=['GET'])
 def get_dog_by_id(iddog=None):
-    return dog_routes.get_dog_by_id(iddog)
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return dog_routes.get_dog_by_id(iddog)
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 5. Buscar cachorro por usuario
 @app.route('/usuarioCachorros/<iduser>', methods=['GET'])
 def get_dogs_by_user(iduser=None):
-    return dog_routes.get_dogs_by_user(iduser)
+    token = request.headers['Authorization'].replace("Bearer ", "")
+    is_verified = jwt_lib_api.verify_token(token, secret_key)
+    if (is_verified):
+        return dog_routes.get_dogs_by_user(iduser)
+
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
 #######################################################
 # 6. Buscar todos os cachorros
