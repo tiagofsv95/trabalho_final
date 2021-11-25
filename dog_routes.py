@@ -10,6 +10,7 @@ import uuid
 dirname = os.path.dirname(__file__)
 database_dirname = dirname + '/database/adote_um_cao.db'
 
+
 #######################################################
 # 1. Cadastrar cachorro
 def create_dog():
@@ -163,6 +164,7 @@ def update_dog():
         finally:
             conn.close()
 
+
 #######################################################
 # 3. Deletar cachorro pelo id
 def delete_dog(iddog):
@@ -186,6 +188,7 @@ def delete_dog(iddog):
             return resp
         finally:
             conn.close()
+
 
 #######################################################
 # 4. Buscar cachorro pelo id
@@ -253,6 +256,7 @@ def get_dogs_by_user(iduser):
 
         finally:
             conn.close()
+
 
 #######################################################
 # 6. Buscar todos os cachorros

@@ -268,7 +268,7 @@ def auth_user():
                 names = [description[0] for description in cur.description]
                 usuario_obj = dict(zip(names, usuario))
                 if (sha256_crypt.verify(password, usuario_obj['password'])):
-                    token = jwt_lib_api.create_token(email, 5, secret_key)
+                    token = jwt_lib_api.create_token(email, 60, secret_key)
                     del usuario_obj['password']
                     json_respose_obj = {
                         'auth': True,

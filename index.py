@@ -9,6 +9,7 @@ import user_routes
 import dog_routes
 import information_routes
 import jwt_lib_api
+import upload_routes
 
 #######################################################
 # Instancia da Aplicacao Flask
@@ -38,11 +39,15 @@ def create_user():
 # 2. Buscar usuarios todos os usuarios
 @app.route('/usuarios', methods=['GET'])
 def get_all_users():
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return user_routes.get_all_users()
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return user_routes.get_all_users()
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -51,11 +56,15 @@ def get_all_users():
 # 3. Buscar usuario pelo id
 @app.route('/usuario/<iduser>', methods=['GET'])
 def get_user_by_id(iduser=None):
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return user_routes.get_user_by_id(iduser)
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return user_routes.get_user_by_id(iduser)
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -64,11 +73,15 @@ def get_user_by_id(iduser=None):
 # 4. Atualizar usuarios pelo id
 @app.route('/usuario/<iduser>', methods=['PUT'])
 def update_user(iduser=None):
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return user_routes.update_user(iduser)
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return user_routes.update_user(iduser)
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -77,11 +90,15 @@ def update_user(iduser=None):
 # 5. Deletar usuarios pelo id
 @app.route('/usuario/<iduser>', methods=['DELETE'])
 def delete_user(iduser=None):
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return user_routes.delete_user(iduser)
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return user_routes.delete_user(iduser)
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -114,11 +131,15 @@ def get_all_breed():
 # 2. Buscar raça pelo id
 @app.route('/raca/<idbreed>', methods=['GET'])
 def get_breed_by_id(idbreed=None):
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return breed_routes.get_breed_by_id(idbreed)
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return breed_routes.get_breed_by_id(idbreed)
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -140,6 +161,7 @@ def get_breed_by_size(sizeId=None):
 def get_all_size():
     return breed_size_routes.get_all_size()
 
+
 #######################################################
 # ROTAS CACHORRO
 #######################################################
@@ -148,11 +170,15 @@ def get_all_size():
 # 1. Cadastrar cachorro
 @app.route('/cachorro', methods=['POST'])
 def create_dog():
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return dog_routes.create_dog()
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return dog_routes.create_dog()
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -161,11 +187,15 @@ def create_dog():
 # 2. Atualizar cachorro
 @app.route('/cachorro', methods=['PUT'])
 def update_dog():
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return dog_routes.update_dog()
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return dog_routes.update_dog()
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -174,11 +204,15 @@ def update_dog():
 # 3. Deletar cachorro
 @app.route('/cachorro/<iddog>', methods=['DELETE'])
 def delete_dog(iddog=None):
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return dog_routes.delete_dog(iddog)
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return dog_routes.delete_dog(iddog)
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -187,11 +221,15 @@ def delete_dog(iddog=None):
 # 4. Buscar cachorro pelo id
 @app.route('/cachorro/<iddog>', methods=['GET'])
 def get_dog_by_id(iddog=None):
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return dog_routes.get_dog_by_id(iddog)
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return dog_routes.get_dog_by_id(iddog)
 
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
         resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
@@ -209,7 +247,7 @@ def get_dogs_by_user(iduser=None):
             resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
             return resp
     else:
-        resp = make_response(jsonify({'auth': False, 'error': 'Nao conseguimos identificar o seu token de acesso.'}), 401)
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
         return resp
 
 #######################################################
@@ -233,91 +271,106 @@ def get_info():
 # ROTA DE UPLOADS
 #######################################################
 
-# 1. Buscar informaçoes
+#######################################################
+# 1. Salvar foto de perfil
 @app.route('/fotoPerfil', methods=['POST'])
-def upload_profile_photo(userid=None):
-    iduser = request.args.get('id')
-    if not os.path.isdir(dirname+'/uploads/perfil/'+iduser):
-        os.mkdir(dirname+'/uploads/perfil/'+iduser)
-    file = request.files['foto']
-    if file.filename == '':
-        print('No selected file')
-    else:
-        try:
-
-            conn = sqlite3.connect(database_dirname)
-            sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + iduser + '"'
-            cur = conn.cursor()
-            cur.execute(sql)
-            usuario = cur.fetchone()
-
-            if usuario:
-
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(dirname+'/uploads/perfil/'+iduser, filename))
-                foto = '/uploads/perfil/'+iduser+'/'+filename
-                registro = (foto,)
-                sql = ''' UPDATE Usuario SET foto = ?, numero = ? WHERE id = ''' + '"' + iduser + '"'
-                cur = conn.cursor()
-                print(registro)
-                cur.execute(sql, registro)
-                conn.commit()
-
-                sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + iduser + '"'
-                cur = conn.cursor()
-                cur.execute(sql)
-                updated_user = cur.fetchone()
-
-                names = [description[0] for description in cur.description]
-
-                json_obj = dict(zip(names, updated_user))
-                del json_obj['password']
-                json_data = [json_obj]
-
-                resp = make_response(jsonify(json_data), 200)
-                return resp
-
-            else:
-                resp = make_response(jsonify({'error': 'Usuario nao encontrado.'}), 400)
-                return resp
-
-        except Error as e:
-            resp = make_response(jsonify({'error': e}), 500)
+def upload_profile_photo():
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return upload_routes.upload_profile_photo()
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
             return resp
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
 
-        finally:
-            conn.close()
 
-
+#######################################################
+# 2. Obter foto de perfil
 @app.route('/fotoPerfil/<iduser>', methods=['GET'])
 def get_profile_photo(iduser=None):
-    if iduser == None:
-        resp = make_response(jsonify({'error': 'Parametro id usuario invalido.'}), 400)
-        return resp
-    else:
-        conn = sqlite3.connect(database_dirname)
-        sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + iduser + '"'
-        cur = conn.cursor()
-        cur.execute(sql)
-        usuario = cur.fetchone()
-
-        if usuario:
-            names = [description[0] for description in cur.description]
-            json_obj = dict(zip(names, usuario))
-            print(json_obj['foto'])
-            if json_obj['foto']:
-                filename = os.path.basename(json_obj['foto'])
-                pathname = json_obj['foto'].replace('/'+filename, '')
-                print(filename)
-                print(pathname)
-                return send_from_directory(dirname+pathname, filename)
-
-            else:
-                resp = make_response(jsonify({'error': 'Foto do usuario nao encontrado.'}), 404)
-                return resp
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if is_verified:
+            return upload_routes.get_profile_photo(iduser)
         else:
-            resp = make_response(jsonify({'error': 'Usuario nao encontrado.'}), 400)
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
             return resp
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
+
+
+#######################################################
+# 3. Deletar foto de perfil
+@app.route('/fotoPerfil/<iduser>', methods=['DELETE'])
+def delete_profile_photo(iduser=None):
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if is_verified:
+            return upload_routes.delete_profile_photo(iduser)
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
+
+#######################################################
+# 4. Salvar foto de cachorro
+@app.route('/fotoCachorro', methods=['POST'])
+def upload_dog_photo():
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return upload_routes.upload_dog_photo()
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
+
+
+#######################################################
+# 5. Obter foto de cachorro
+@app.route('/fotoCachorro/<iddog>', methods=['GET'])
+def get_dog_photo(iddog=None):
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if is_verified:
+            return upload_routes.get_dog_photo(iddog)
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
+
+
+#######################################################
+# 6. Deletar foto de perfil
+@app.route('/fotoCachorro/<iddog>', methods=['DELETE'])
+def delete_dog_photo(iddog=None):
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if is_verified:
+            return upload_routes.delete_dog_photo(iddog)
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
+    else:
+        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        return resp
+
 
 #######################################################
 # Rota de Erro
