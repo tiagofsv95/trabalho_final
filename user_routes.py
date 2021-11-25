@@ -197,7 +197,7 @@ def update_user(iduser):
                     registro = (nome, rua, numero, bairro, cep, cidadeId, estadoId, telefone)
 
                     sql = ''' UPDATE Usuario
-                                            SET nome = ?, rua = ?, numero = ?, bairro = ?, cep = ?, cidadeId = ?, estadoId = ?, telefone =?
+                                            SET nome = ?, rua = ?, numero = ?, bairro = ?, cep = ?, cidadeId = ?, estadoId = ?, telefone = ?
                                             WHERE id = ''' + '"' + iduser + '"'
                     cur = conn.cursor()
                     cur.execute(sql, registro)

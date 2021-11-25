@@ -1,7 +1,7 @@
-from flask import Flask
-from flask import request
-from flask import jsonify
-from flask import make_response
+from flask import Flask, request, jsonify, make_response, send_from_directory
+from werkzeug.utils import secure_filename
+import sqlite3
+from sqlite3 import Error
 import os
 import breed_routes
 import breed_size_routes
@@ -200,13 +200,16 @@ def get_dog_by_id(iddog=None):
 # 5. Buscar cachorro por usuario
 @app.route('/usuarioCachorros/<iduser>', methods=['GET'])
 def get_dogs_by_user(iduser=None):
-    token = request.headers['Authorization'].replace("Bearer ", "")
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return dog_routes.get_dogs_by_user(iduser)
-
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace("Bearer ", "")
+        is_verified = jwt_lib_api.verify_token(token, secret_key)
+        if (is_verified):
+            return dog_routes.get_dogs_by_user(iduser)
+        else:
+            resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+            return resp
     else:
-        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
+        resp = make_response(jsonify({'auth': False, 'error': 'Nao conseguimos identificar o seu token de acesso.'}), 401)
         return resp
 
 #######################################################
@@ -225,6 +228,96 @@ def get_all_dogs():
 def get_info():
     return information_routes.get_info()
 
+
+#######################################################
+# ROTA DE UPLOADS
+#######################################################
+
+# 1. Buscar informaçoes
+@app.route('/fotoPerfil', methods=['POST'])
+def upload_profile_photo(userid=None):
+    iduser = request.args.get('id')
+    if not os.path.isdir(dirname+'/uploads/perfil/'+iduser):
+        os.mkdir(dirname+'/uploads/perfil/'+iduser)
+    file = request.files['foto']
+    if file.filename == '':
+        print('No selected file')
+    else:
+        try:
+
+            conn = sqlite3.connect(database_dirname)
+            sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + iduser + '"'
+            cur = conn.cursor()
+            cur.execute(sql)
+            usuario = cur.fetchone()
+
+            if usuario:
+
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(dirname+'/uploads/perfil/'+iduser, filename))
+                foto = '/uploads/perfil/'+iduser+'/'+filename
+                registro = (foto,)
+                sql = ''' UPDATE Usuario SET foto = ?, numero = ? WHERE id = ''' + '"' + iduser + '"'
+                cur = conn.cursor()
+                print(registro)
+                cur.execute(sql, registro)
+                conn.commit()
+
+                sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + iduser + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                updated_user = cur.fetchone()
+
+                names = [description[0] for description in cur.description]
+
+                json_obj = dict(zip(names, updated_user))
+                del json_obj['password']
+                json_data = [json_obj]
+
+                resp = make_response(jsonify(json_data), 200)
+                return resp
+
+            else:
+                resp = make_response(jsonify({'error': 'Usuario nao encontrado.'}), 400)
+                return resp
+
+        except Error as e:
+            resp = make_response(jsonify({'error': e}), 500)
+            return resp
+
+        finally:
+            conn.close()
+
+
+@app.route('/fotoPerfil/<iduser>', methods=['GET'])
+def get_profile_photo(iduser=None):
+    if iduser == None:
+        resp = make_response(jsonify({'error': 'Parametro id usuario invalido.'}), 400)
+        return resp
+    else:
+        conn = sqlite3.connect(database_dirname)
+        sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + iduser + '"'
+        cur = conn.cursor()
+        cur.execute(sql)
+        usuario = cur.fetchone()
+
+        if usuario:
+            names = [description[0] for description in cur.description]
+            json_obj = dict(zip(names, usuario))
+            print(json_obj['foto'])
+            if json_obj['foto']:
+                filename = os.path.basename(json_obj['foto'])
+                pathname = json_obj['foto'].replace('/'+filename, '')
+                print(filename)
+                print(pathname)
+                return send_from_directory(dirname+pathname, filename)
+
+            else:
+                resp = make_response(jsonify({'error': 'Foto do usuario nao encontrado.'}), 404)
+                return resp
+        else:
+            resp = make_response(jsonify({'error': 'Usuario nao encontrado.'}), 400)
+            return resp
 
 #######################################################
 # Rota de Erro
