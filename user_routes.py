@@ -15,11 +15,6 @@ secret_key = '223d81adc68996234dd0734219aac254'
 #######################################################
 # 1. Criar usuario
 def create_user():
-    usuario = request.json
-    for attr, value in usuario.items():
-        if not value and attr != 'foto':
-            resp = make_response(jsonify({'error': 'Erro na requisição. Campo ' + attr + ' sem registro.'}), 400)
-            return resp
 
     nome = request.json['nome']
     email = request.json['email']

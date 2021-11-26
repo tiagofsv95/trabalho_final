@@ -14,11 +14,6 @@ database_dirname = dirname + '/database/adote_um_cao.db'
 #######################################################
 # 1. Cadastrar cachorro
 def create_dog():
-    cachorro = request.json
-    for attr, value in cachorro.items():
-        if (not value and attr != 'foto') and (not value and attr != 'informacoes') and (not value and attr != 'adotado'):
-            resp = make_response(jsonify({'mensagem': 'Erro na requisição. Campo ' + attr + ' sem registro.'}), 400)
-            return resp
 
     nome = request.json['nome']
     informacoes = request.json['informacoes']
@@ -135,7 +130,7 @@ def update_dog():
                     registro = (nome, rua, numero, bairro, cep, cidadeId, estadoId, racaId, sexoId, informacoes, adotado, mostrarEndereco, usuarioId)
 
                     sql = ''' UPDATE Cachorro
-                                            SET nome = ?, rua = ?, numero = ?, bairro = ?, cep = ?, cidadeId = ?, racaId = ?, 
+                                            SET nome = ?, rua = ?, numero = ?, bairro = ?, cep = ?, cidadeId = ?, estadoId = ?, racaId = ?, 
                                             sexoId = ?, informacoes = ?, adotado = ?, mostrarEndereco = ?, usuarioId = ?
                                             WHERE id = ''' + '"' + iddog + '"'
                     cur = conn.cursor()
@@ -148,7 +143,6 @@ def update_dog():
                     updated_dog = cur.fetchone()
 
                     json_obj = dict(zip(names, updated_dog))
-                    del json_obj['password']
                     json_data = [json_obj]
 
                     resp = make_response(jsonify(json_data), 200)
@@ -206,7 +200,65 @@ def get_dog_by_id(iddog):
 
             if registro:
                 names = [description[0] for description in cur.description]
-                json_data = [dict(zip(names, registro))]
+                json_data = []
+
+                cachorro_json_obj = dict(zip(names, registro))
+                sql = '''SELECT * FROM Raca WHERE id = ''' + '"' + str(cachorro_json_obj['racaId']) + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_raca = cur.fetchone()
+
+                raca_json_obj = dict(zip([description[0] for description in cur.description], registro_raca))
+
+                sql = '''SELECT * FROM Porte WHERE id = ''' + '"' + str(raca_json_obj['porteId']) + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_porte = cur.fetchone()
+                porte_json_obj = dict(zip([description[0] for description in cur.description], registro_porte))
+
+                raca_json_obj['Porte'] = porte_json_obj
+
+                cachorro_json_obj['Raca'] = raca_json_obj
+
+                sql = '''SELECT * FROM Sexo WHERE id = ''' + '"' + str(cachorro_json_obj['sexoId']) + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_sexo = cur.fetchone()
+
+                sexo_json_obj = dict(zip([description[0] for description in cur.description], registro_sexo))
+
+                cachorro_json_obj['Sexo'] = sexo_json_obj
+
+                sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + cachorro_json_obj['usuarioId'] + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_usuario = cur.fetchone()
+
+                usuario_json_obj = dict(zip([description[0] for description in cur.description], registro_usuario))
+                del usuario_json_obj['password']
+
+                cachorro_json_obj['Usuario'] = usuario_json_obj
+
+                sql = '''SELECT * FROM Estado WHERE id = ''' + '"' + cachorro_json_obj['estadoId'] + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_estado = cur.fetchone()
+
+                estado_json_obj = dict(zip([description[0] for description in cur.description], registro_estado))
+
+                cachorro_json_obj['Estado'] = estado_json_obj
+
+                sql = '''SELECT * FROM Municipio WHERE id = ''' + '"' + str(cachorro_json_obj['cidadeId']) + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_municipio = cur.fetchone()
+
+                municipio_json_obj = dict(zip([description[0] for description in cur.description], registro_municipio))
+
+                cachorro_json_obj['Municipio'] = municipio_json_obj
+
+                json_data.append(cachorro_json_obj)
+
                 resp = make_response(jsonify(json_data), 200)
                 return resp
 
@@ -241,7 +293,63 @@ def get_dogs_by_user(iduser):
 
                 json_data = []
                 for reg in registros:
-                    json_data.append(dict(zip(names, reg)))
+                    cachorro_json_obj = dict(zip(names, reg))
+                    sql = '''SELECT * FROM Raca WHERE id = ''' + '"' + str(cachorro_json_obj['racaId']) + '"'
+                    cur = conn.cursor()
+                    cur.execute(sql)
+                    registro_raca = cur.fetchone()
+
+                    raca_json_obj = dict(zip([description[0] for description in cur.description], registro_raca))
+
+                    sql = '''SELECT * FROM Porte WHERE id = ''' + '"' + str(raca_json_obj['porteId']) + '"'
+                    cur = conn.cursor()
+                    cur.execute(sql)
+                    registro_porte = cur.fetchone()
+                    porte_json_obj = dict(zip([description[0] for description in cur.description], registro_porte))
+
+                    raca_json_obj['Porte'] = porte_json_obj
+
+                    cachorro_json_obj['Raca'] = raca_json_obj
+
+                    sql = '''SELECT * FROM Sexo WHERE id = ''' + '"' + str(cachorro_json_obj['sexoId']) + '"'
+                    cur = conn.cursor()
+                    cur.execute(sql)
+                    registro_sexo = cur.fetchone()
+
+                    sexo_json_obj = dict(zip([description[0] for description in cur.description], registro_sexo))
+
+                    cachorro_json_obj['Sexo'] = sexo_json_obj
+
+                    sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + cachorro_json_obj['usuarioId'] + '"'
+                    cur = conn.cursor()
+                    cur.execute(sql)
+                    registro_usuario = cur.fetchone()
+
+                    usuario_json_obj = dict(zip([description[0] for description in cur.description], registro_usuario))
+                    del usuario_json_obj['password']
+
+                    cachorro_json_obj['Usuario'] = usuario_json_obj
+
+                    sql = '''SELECT * FROM Estado WHERE id = ''' + '"' + cachorro_json_obj['estadoId'] + '"'
+                    cur = conn.cursor()
+                    cur.execute(sql)
+                    registro_estado = cur.fetchone()
+
+                    estado_json_obj = dict(zip([description[0] for description in cur.description], registro_estado))
+
+                    cachorro_json_obj['Estado'] = estado_json_obj
+
+                    sql = '''SELECT * FROM Municipio WHERE id = ''' + '"' + str(cachorro_json_obj['cidadeId']) + '"'
+                    cur = conn.cursor()
+                    cur.execute(sql)
+                    registro_municipio = cur.fetchone()
+
+                    municipio_json_obj = dict(
+                        zip([description[0] for description in cur.description], registro_municipio))
+
+                    cachorro_json_obj['Municipio'] = municipio_json_obj
+
+                    json_data.append(cachorro_json_obj)
 
                 resp = make_response(jsonify(json_data), 200)
                 return resp
@@ -271,9 +379,65 @@ def get_all_dogs():
         if registros:
             names = [description[0] for description in cur.description]
 
+            print(names)
             json_data = []
             for reg in registros:
-                json_data.append(dict(zip(names, reg)))
+                cachorro_json_obj = dict(zip(names, reg))
+                sql = '''SELECT * FROM Raca WHERE id = ''' + '"' + str(cachorro_json_obj['racaId']) + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_raca = cur.fetchone()
+
+                raca_json_obj = dict(zip([description[0] for description in cur.description], registro_raca))
+
+                sql = '''SELECT * FROM Porte WHERE id = ''' + '"' + str(raca_json_obj['porteId']) + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_porte = cur.fetchone()
+                porte_json_obj = dict(zip([description[0] for description in cur.description], registro_porte))
+
+                raca_json_obj['Porte'] = porte_json_obj
+
+                cachorro_json_obj['Raca'] = raca_json_obj
+
+                sql = '''SELECT * FROM Sexo WHERE id = ''' + '"' + str(cachorro_json_obj['sexoId']) + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_sexo = cur.fetchone()
+
+                sexo_json_obj = dict(zip([description[0] for description in cur.description], registro_sexo))
+
+                cachorro_json_obj['Sexo'] = sexo_json_obj
+
+                sql = '''SELECT * FROM Usuario WHERE id = ''' + '"' + cachorro_json_obj['usuarioId'] + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_usuario = cur.fetchone()
+
+                usuario_json_obj = dict(zip([description[0] for description in cur.description], registro_usuario))
+                del usuario_json_obj['password']
+
+                cachorro_json_obj['Usuario'] = usuario_json_obj
+
+                sql = '''SELECT * FROM Estado WHERE id = ''' + '"' + cachorro_json_obj['estadoId'] + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_estado = cur.fetchone()
+
+                estado_json_obj = dict(zip([description[0] for description in cur.description], registro_estado))
+
+                cachorro_json_obj['Estado'] = estado_json_obj
+
+                sql = '''SELECT * FROM Municipio WHERE id = ''' + '"' + str(cachorro_json_obj['cidadeId']) + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                registro_municipio = cur.fetchone()
+
+                municipio_json_obj = dict(zip([description[0] for description in cur.description], registro_municipio))
+
+                cachorro_json_obj['Municipio'] = municipio_json_obj
+
+                json_data.append(cachorro_json_obj)
 
             resp = make_response(jsonify(json_data), 200)
             return resp

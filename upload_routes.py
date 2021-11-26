@@ -34,7 +34,6 @@ def upload_profile_photo():
                 registro = (foto,)
                 sql = ''' UPDATE Usuario SET foto = ? WHERE id = ''' + '"' + iduser + '"'
                 cur = conn.cursor()
-                print(registro)
                 cur.execute(sql, registro)
                 conn.commit()
 
@@ -80,12 +79,9 @@ def get_profile_photo(iduser=None):
         if usuario:
             names = [description[0] for description in cur.description]
             json_obj = dict(zip(names, usuario))
-            print(json_obj['foto'])
             if json_obj['foto']:
                 filename = os.path.basename(json_obj['foto'])
                 pathname = json_obj['foto'].replace('/'+filename, '')
-                print(filename)
-                print(pathname)
                 return send_from_directory(dirname+pathname, filename)
 
             else:
@@ -160,7 +156,6 @@ def upload_dog_photo():
                 registro = (foto,)
                 sql = ''' UPDATE Cachorro SET foto = ? WHERE id = ''' + '"' + iddog + '"'
                 cur = conn.cursor()
-                print(registro)
                 cur.execute(sql, registro)
                 conn.commit()
 
@@ -205,12 +200,9 @@ def get_dog_photo(iddog=None):
         if cachorro:
             names = [description[0] for description in cur.description]
             json_obj = dict(zip(names, cachorro))
-            print(json_obj['foto'])
             if json_obj['foto']:
                 filename = os.path.basename(json_obj['foto'])
                 pathname = json_obj['foto'].replace('/'+filename, '')
-                print(filename)
-                print(pathname)
                 return send_from_directory(dirname+pathname, filename)
 
             else:

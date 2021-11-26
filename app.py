@@ -251,7 +251,11 @@ def get_dogs_by_user(iduser=None):
     elif 'X-Access-Token' in request.headers:
         token = request.headers['X-Access-Token']
 
+    print(token)
+
     is_verified = jwt_lib_api.verify_token(token, secret_key)
+
+    print(is_verified)
     if (is_verified):
         return dog_routes.get_dogs_by_user(iduser)
     else:
@@ -284,101 +288,42 @@ def get_info():
 # 1. Salvar foto de perfil
 @app.route('/fotoPerfil', methods=['POST'])
 def upload_profile_photo():
-    if 'Authorization' in request.headers:
-        token = request.headers['Authorization'].replace("Bearer ", "")
-    elif 'X-Access-Token' in request.headers:
-        token = request.headers['X-Access-Token']
-
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return upload_routes.upload_profile_photo()
-    else:
-        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
-        return resp
+    return upload_routes.upload_profile_photo()
 
 
 #######################################################
 # 2. Obter foto de perfil
 @app.route('/fotoPerfil/<iduser>', methods=['GET'])
 def get_profile_photo(iduser=None):
-    if 'Authorization' in request.headers:
-        token = request.headers['Authorization'].replace("Bearer ", "")
-    elif 'X-Access-Token' in request.headers:
-        token = request.headers['X-Access-Token']
-
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if is_verified:
-        return upload_routes.get_profile_photo(iduser)
-    else:
-        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
-        return resp
+    return upload_routes.get_profile_photo(iduser)
 
 
 #######################################################
 # 3. Deletar foto de perfil
 @app.route('/fotoPerfil/<iduser>', methods=['DELETE'])
 def delete_profile_photo(iduser=None):
-    if 'Authorization' in request.headers:
-        token = request.headers['Authorization'].replace("Bearer ", "")
-    elif 'X-Access-Token' in request.headers:
-        token = request.headers['X-Access-Token']
+    return upload_routes.delete_profile_photo(iduser)
 
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if is_verified:
-        return upload_routes.delete_profile_photo(iduser)
-    else:
-        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
-        return resp
 
 #######################################################
 # 4. Salvar foto de cachorro
 @app.route('/fotoCachorro', methods=['POST'])
 def upload_dog_photo():
-    if 'Authorization' in request.headers:
-        token = request.headers['Authorization'].replace("Bearer ", "")
-    elif 'X-Access-Token' in request.headers:
-        token = request.headers['X-Access-Token']
-
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if (is_verified):
-        return upload_routes.upload_dog_photo()
-    else:
-        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
-        return resp
+    return upload_routes.upload_dog_photo()
 
 
 #######################################################
 # 5. Obter foto de cachorro
 @app.route('/fotoCachorro/<iddog>', methods=['GET'])
 def get_dog_photo(iddog=None):
-    if 'Authorization' in request.headers:
-        token = request.headers['Authorization'].replace("Bearer ", "")
-    elif 'X-Access-Token' in request.headers:
-        token = request.headers['X-Access-Token']
-
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if is_verified:
-        return upload_routes.get_dog_photo(iddog)
-    else:
-        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
-        return resp
+    return upload_routes.get_dog_photo(iddog)
 
 
 #######################################################
 # 6. Deletar foto de perfil
 @app.route('/fotoCachorro/<iddog>', methods=['DELETE'])
 def delete_dog_photo(iddog=None):
-    if 'Authorization' in request.headers:
-        token = request.headers['Authorization'].replace("Bearer ", "")
-    elif 'X-Access-Token' in request.headers:
-        token = request.headers['X-Access-Token']
-
-    is_verified = jwt_lib_api.verify_token(token, secret_key)
-    if is_verified:
-        return upload_routes.delete_dog_photo(iddog)
-    else:
-        resp = make_response(jsonify({'auth': False, 'error': 'Seu login expirou !'}), 401)
-        return resp
+    return upload_routes.delete_dog_photo(iddog)
 
 
 #######################################################

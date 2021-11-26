@@ -61,7 +61,7 @@ def get_info():
         municipios = cur.fetchall()
         municipios_json_obj = []
         for reg in municipios:
-            municipios_json_obj.append(dict(zip(['id', 'nome'], reg)))
+            municipios_json_obj.append(dict(zip(['id', 'nome', 'estadoId'], reg)))
 
         registro = (portes_json_obj, racas_json_obj, sexos_animais_json_obj, sexos_seres_humanos_json_obj, estados_json_obj, municipios_json_obj)
         json_data = dict(zip(['portes', 'racas', 'sexosAnimais', 'sexosSeresHumanos', 'estados', 'municipios'], registro))
