@@ -23,8 +23,14 @@ Uma API refatorada em **python** para o site https://vast-retreat-90043.herokuap
 ### Funcionalidades da aplicação
 
 
+
 [API - raiz](https://calm-beach-73839.herokuapp.com/)
+
+
 [API - rota de teste](https://calm-beach-73839.herokuapp.com/teste)
+
+
+[Documentaçao API](https://calm-caverns-27003.herokuapp.com/)
 
 
 ## :memo: Licença
