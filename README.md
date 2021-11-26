@@ -33,6 +33,9 @@ Uma API refatorada em **python** para o site https://vast-retreat-90043.herokuap
 [Documentaçao API](https://calm-caverns-27003.herokuapp.com/)
 
 
+[API insominia](Insomnia_2021-11-26.json)
+
+
 ## :memo: Licença
 
 Esse projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
