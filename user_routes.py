@@ -128,7 +128,14 @@ def get_user_by_id(iduser=None):
                 names = [description[0] for description in cur.description]
                 json_obj = dict(zip(names, registro))
                 del json_obj['password']
-                json_data = [json_obj]
+                json_data = json_obj
+
+                sql = '''SELECT * FROM Sexo WHERE id = ''' + '"' + json_data['sexoId'] + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                Sexo = cur.fetchone()
+                json_data['Sexo'] = Sexo
+
                 resp = make_response(jsonify(json_data), 200)
                 return resp
 
@@ -254,7 +261,7 @@ def delete_user(iduser=None):
 # 6. Autenticar usuario
 def auth_user():
     email = request.json['email']
-    password = request.json['password']
+    password = request.json['senha']
 
     if email and password:
         try:
