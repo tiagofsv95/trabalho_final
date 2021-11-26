@@ -15,11 +15,6 @@ secret_key = '223d81adc68996234dd0734219aac254'
 #######################################################
 # 1. Criar usuario
 def create_user():
-    usuario = request.json
-    for attr, value in usuario.items():
-        if not value and attr != 'foto':
-            resp = make_response(jsonify({'mensagem': 'Erro na requisição. Campo ' + attr + ' sem registro.'}), 400)
-            return resp
 
     nome = request.json['nome']
     email = request.json['email']
@@ -36,7 +31,7 @@ def create_user():
 
     if nome and email and rua and numero and bairro and cep and cidadeId and estadoId and sexoId and telefone and senha_um and senha_dois:
         if senha_um != senha_dois:
-            resp = make_response(jsonify({'mensagem': 'Erro na requisição. Senhas sao diferentes.'}), 400)
+            resp = make_response(jsonify({'error': 'Erro na requisição. Senhas sao diferentes.'}), 400)
             return resp
 
         id_usuario = str(uuid.uuid4())
@@ -52,7 +47,7 @@ def create_user():
             registro_existe = cur.fetchone()
 
             if registro_existe:
-                resp = make_response(jsonify({'mensagem': 'O email ' + email + ' já está cadastrado.'}), 400)
+                resp = make_response(jsonify({'error': 'O email ' + email + ' já está cadastrado.'}), 400)
                 return resp
 
             sql = ''' INSERT INTO Usuario (id, nome, email, rua, numero, bairro, cep, cidadeId, estadoId, sexoId, telefone, password)
@@ -69,12 +64,12 @@ def create_user():
             return resp
 
         except Error as e:
-            resp = make_response(jsonify({'mensagem': e}), 500)
+            resp = make_response(jsonify({'error': e}), 500)
             return resp
         finally:
             conn.close()
     else:
-        resp = make_response(jsonify({'mensagem': 'Erro na requisição.'}), 400)
+        resp = make_response(jsonify({'error': 'Erro na requisição.'}), 400)
         return resp
 
 #######################################################
@@ -100,11 +95,11 @@ def get_all_users():
             return resp
 
         else:
-            resp = make_response(jsonify({'mensagem': 'Registro não encontrado.'}), 204)
+            resp = make_response(jsonify({'error': 'Registro não encontrado.'}), 204)
             return resp
 
     except Error as e:
-        resp = make_response(jsonify({'mensagem': e}), 500)
+        resp = make_response(jsonify({'error': e}), 500)
         return resp
 
     finally:
@@ -114,7 +109,7 @@ def get_all_users():
 # 3. Buscar usuario pelo id
 def get_user_by_id(iduser=None):
     if iduser == None:
-        resp = make_response(jsonify({'mensagem': 'Parametro id do usuario invalido.'}), 400)
+        resp = make_response(jsonify({'error': 'Parametro id do usuario invalido.'}), 400)
         return resp
     else:
         try:
@@ -128,16 +123,23 @@ def get_user_by_id(iduser=None):
                 names = [description[0] for description in cur.description]
                 json_obj = dict(zip(names, registro))
                 del json_obj['password']
-                json_data = [json_obj]
+                json_data = json_obj
+
+                sql = '''SELECT * FROM Sexo WHERE id = ''' + '"' + json_data['sexoId'] + '"'
+                cur = conn.cursor()
+                cur.execute(sql)
+                Sexo = cur.fetchone()
+                json_data['Sexo'] = Sexo
+
                 resp = make_response(jsonify(json_data), 200)
                 return resp
 
             else:
-                resp = make_response(jsonify({'mensagem': 'Registro não encontrado.'}), 204)
+                resp = make_response(jsonify({'error': 'Registro não encontrado.'}), 204)
                 return resp
 
         except Error as e:
-            resp = make_response(jsonify({'mensagem': e}), 500)
+            resp = make_response(jsonify({'error': e}), 500)
             return resp
 
         finally:
@@ -147,7 +149,7 @@ def get_user_by_id(iduser=None):
 # 4. Atualizar usuarios pelo id
 def update_user(iduser):
     if iduser == None:
-        resp = make_response(jsonify({'mensagem': 'Parametro id usuario invalido.'}), 400)
+        resp = make_response(jsonify({'error': 'Parametro id usuario invalido.'}), 400)
         return resp
     else:
         try:
@@ -197,7 +199,7 @@ def update_user(iduser):
                     registro = (nome, rua, numero, bairro, cep, cidadeId, estadoId, telefone)
 
                     sql = ''' UPDATE Usuario
-                                            SET nome = ?, rua = ?, numero = ?, bairro = ?, cep = ?, cidadeId = ?, estadoId = ?, telefone =?
+                                            SET nome = ?, rua = ?, numero = ?, bairro = ?, cep = ?, cidadeId = ?, estadoId = ?, telefone = ?
                                             WHERE id = ''' + '"' + iduser + '"'
                     cur = conn.cursor()
                     cur.execute(sql, registro)
@@ -216,11 +218,11 @@ def update_user(iduser):
                     return resp
 
             else:
-                resp = make_response(jsonify({'mensagem': 'Usuario nao encontrado.'}), 400)
+                resp = make_response(jsonify({'error': 'Usuario nao encontrado.'}), 400)
                 return resp
 
         except Error as e:
-            resp = make_response(jsonify({'mensagem': e}), 500)
+            resp = make_response(jsonify({'error': e}), 500)
             return resp
         finally:
             conn.close()
@@ -230,7 +232,7 @@ def update_user(iduser):
 # 5. Deletar usuarios pelo id
 def delete_user(iduser=None):
     if iduser == None:
-        resp = make_response(jsonify({'mensagem': 'Parametro idproduto invalido.'}), 400)
+        resp = make_response(jsonify({'error': 'Parametro idproduto invalido.'}), 400)
         return resp
     else:
         try:
@@ -241,11 +243,11 @@ def delete_user(iduser=None):
 
             conn.commit()
 
-            resp = make_response(jsonify({'mensagem': 'Registro deletado com sucesso.'}), 200)
+            resp = make_response(jsonify({'error': 'Registro deletado com sucesso.'}), 200)
             return resp
         except Error as e:
             print(e)
-            resp = make_response(jsonify({'mensagem': e}), 500)
+            resp = make_response(jsonify({'error': e}), 500)
             return resp
         finally:
             conn.close()
@@ -254,7 +256,7 @@ def delete_user(iduser=None):
 # 6. Autenticar usuario
 def auth_user():
     email = request.json['email']
-    password = request.json['password']
+    password = request.json['senha']
 
     if email and password:
         try:
@@ -268,7 +270,7 @@ def auth_user():
                 names = [description[0] for description in cur.description]
                 usuario_obj = dict(zip(names, usuario))
                 if (sha256_crypt.verify(password, usuario_obj['password'])):
-                    token = jwt_lib_api.create_token(email, 5, secret_key)
+                    token = jwt_lib_api.create_token(email, 60, secret_key)
                     del usuario_obj['password']
                     json_respose_obj = {
                         'auth': True,
@@ -281,21 +283,21 @@ def auth_user():
                     return resp
 
                 else:
-                    resp = make_response(jsonify({'mensagem': 'Email ou senha incorretos!'}), 400)
+                    resp = make_response(jsonify({'error': 'Email ou senha incorretos!'}), 400)
                     return resp
 
             else:
-                resp = make_response(jsonify({'mensagem': 'Email ou senha incorretos!'}), 400)
+                resp = make_response(jsonify({'error': 'Email ou senha incorretos!'}), 400)
                 return resp
 
         except Error as e:
-            resp = make_response(jsonify({'mensagem': e}), 500)
+            resp = make_response(jsonify({'error': e}), 500)
             return resp
 
         finally:
             conn.close()
     else:
-        resp = make_response(jsonify({'mensagem': 'Campo email ou senha vazios!'}), 400)
+        resp = make_response(jsonify({'error': 'Campo email ou senha vazios!'}), 400)
         return resp
 
 

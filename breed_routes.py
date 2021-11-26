@@ -26,11 +26,11 @@ def get_all_breed():
             return resp
 
         else:
-            resp = make_response(jsonify({'mensagem': 'Registro não encontrado.'}), 204)
+            resp = make_response(jsonify({'error': 'Registro não encontrado.'}), 204)
             return resp
 
     except Error as e:
-        resp = make_response(jsonify({'mensagem': e}), 500)
+        resp = make_response(jsonify({'error': e}), 500)
         return resp
 
     finally:
@@ -39,7 +39,7 @@ def get_all_breed():
 # 1. Buscar usuario pelo id
 def get_breed_by_id(idbreed=None):
     if idbreed == None:
-        resp = make_response(jsonify({'mensagem': 'Parametro id raça invalido.'}), 400)
+        resp = make_response(jsonify({'error': 'Parametro id raça invalido.'}), 400)
         return resp
     else:
         try:
@@ -56,11 +56,11 @@ def get_breed_by_id(idbreed=None):
                 return resp
 
             else:
-                resp = make_response(jsonify({'mensagem': 'Registro não encontrado.'}), 204)
+                resp = make_response(jsonify({'error': 'Registro não encontrado.'}), 204)
                 return resp
 
         except Error as e:
-            resp = make_response(jsonify({'mensagem': e}), 500)
+            resp = make_response(jsonify({'error': e}), 500)
             return resp
 
         finally:
@@ -69,7 +69,7 @@ def get_breed_by_id(idbreed=None):
 # 1. Buscar usuario pelo id
 def get_breed_by_size(sizeId=None):
     if sizeId == None:
-        resp = make_response(jsonify({'mensagem': 'Parametro porteId da raça invalido.'}), 400)
+        resp = make_response(jsonify({'error': 'Parametro porteId da raça invalido.'}), 400)
         return resp
     else:
         try:
@@ -90,11 +90,11 @@ def get_breed_by_size(sizeId=None):
                 return resp
 
             else:
-                resp = make_response(jsonify({'mensagem': 'Registro não encontrado.'}), 204)
+                resp = make_response(jsonify({'error': 'Registro não encontrado.'}), 204)
                 return resp
 
         except Error as e:
-            resp = make_response(jsonify({'mensagem': e}), 500)
+            resp = make_response(jsonify({'error': e}), 500)
             return resp
 
         finally:
