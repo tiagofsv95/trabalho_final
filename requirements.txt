@@ -24,7 +24,6 @@ pyasn1==0.4.8
 pycodestyle==2.7.0
 pycparser==2.21
 pydantic==1.8.2
-pygame==1.9.6
 PyJWT==2.3.0
 pylint==2.5.3
 requests==2.24.0
