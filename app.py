@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response, send_from_directory
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import os
 import breed_routes
